@@ -1,5 +1,5 @@
 <?php
-require 'db/utils';
+require 'db/utils.php';
 
 header('Access-Control-Allow-Origin: *');
 
@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $db = connect();
     if (isset($_GET['id'])) {
         // Mostrar un post
-        $query = "SELECT * FROM" . DB_DATABASE . "WHERE id=:id";
+        $query = "SELECT * FROM posts WHERE id=:id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':id', $_GET['id']);
         $stmt->execute();
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         exit();
     } else {
         // Mostrar todos los posts
-        $query = "SELECT * FROM" . DB_DATABASE;
+        $query = "SELECT * FROM posts";
         $stmt = $db->prepare($query);
         $stmt->execute();
         header("HTTP/1.1 200 OK");
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $db = connect();
     $input = $_POST;
-    $query = "INSERT INTO " . DB_DATABASE . "(title, status, content) VALUES (:title, :status, :content)";
+    $query = "INSERT INTO posts (title, status, content) VALUES (:title, :status, :content)";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':title', $_POST['title']);
     $stmt->bindParam(':status', $_POST['status']);
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     $db = connect();
     $id = $_GET['id'];
-    $query = "DELETE FROM" . DB_DATABASE . "WHERE id=:id";
+    $query = "DELETE FROM posts WHERE id=:id";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
@@ -59,3 +59,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     disconnect();
     exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+    //unset($_POST['METHOD']);
+    $db = connect();
+
+    $postId = $_GET['id'];
+    if (!isset($_POST)) {
+        echo 'not isset';
+    }
+    echo json_encode($_POST);
+    $title = $_POST['title'];
+    $status = $_POST['status'];
+    $content = $_POST['content'];
+
+    $query = "UPDATE posts SET title=:title, status=:status, content=:content WHERE id=:id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':title', $title);
+    $stmt->bindParam(':status', $status);
+    $stmt->bindParam(':content', $content);
+    $stmt->bindParam(':id', $postId);
+    $stmt->execute();
+    header("HTTP/1.1 200 OK");
+    disconnect();
+    exit();
+}
+
+header("HTTP/1.1 400 Bad Request");

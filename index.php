@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $db = connect();
     $input = $_POST;
-    $query = "INSERT INTO " . DB_DATABASE . "(title, status, content) VALUES (:title, ;status, :content)";
+    $query = "INSERT INTO " . DB_DATABASE . "(title, status, content) VALUES (:title, :status, :content)";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':title', $_POST['title']);
     $stmt->bindParam(':status', $_POST['status']);
@@ -44,4 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode($input);
         exit();
     }
+
+    disconnect();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    $db = connect();
+    $id = $_GET['id'];
+    $query = "DELETE FROM" . DB_DATABASE . "WHERE id=:id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    header("HTTP/1.1 200 OK");
+    disconnect();
+    exit();
 }

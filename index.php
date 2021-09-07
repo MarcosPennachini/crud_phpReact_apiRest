@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_POST['METHOD'] == 'POST') {
+    unset($_POST['METHOD']);
     $db = connect();
     $input = $_POST;
     $query = "INSERT INTO posts (title, status, content) VALUES (:title, :status, :content)";
@@ -60,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-    //unset($_POST['METHOD']);
+if ($_POST['METHOD'] == 'PUT') {
+    unset($_POST['METHOD']);
     $db = connect();
 
     $postId = $_GET['id'];
